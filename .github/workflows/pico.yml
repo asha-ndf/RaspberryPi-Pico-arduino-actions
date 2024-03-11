@@ -1,0 +1,23 @@
+name: Raspberry Pi Pico CI
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    name: Compile Sketch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Install platform
+        run: |
+          arduino-cli config init --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+          arduino-cli core update-index
+          arduino-cli core search srp2040
+          arduino-cli core install rp2040:rp2040
+          arduino-cli lib install ArduinoJson@5.13.5
+      - name: Compile Sketch
+        run: arduino-cli compile --fqbn rp2040:rp2040:rpipico ./main
